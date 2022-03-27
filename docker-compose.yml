@@ -6,7 +6,7 @@ services:
     container_name: discordjs
     networks:
       br0:
-        ipv4_address: '10.0.3.98'
+        ipv4_address: '10.0.3.123'
 
 networks:
   br0:
