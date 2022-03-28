@@ -39,5 +39,9 @@ module.exports = async (name, type, value) => {
       'Content-Type': 'application/json'
     }
   };
-  await fetch(url, options);
+  try {
+    await fetch(url, options);
+  } catch (err) {
+    console.error(`Could not update ${name} ${type} to ${value} with ${err}`);
+  }
 };
