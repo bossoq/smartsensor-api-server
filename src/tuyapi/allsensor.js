@@ -32,6 +32,11 @@ module.exports = class Sensor {
 
     device.on('disconnected', () => {
       console.log(`Disconnected from device ${this.name}.`);
+      setTimeout(() => {
+        device.find().then(() => {
+          device.connect();
+        });
+      }, 5000);
     });
 
     device.on('error', (error) => {
