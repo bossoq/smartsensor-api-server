@@ -12,7 +12,7 @@ module.exports = class Sensor {
     this.PM1 = 0;
     this.TEMP = 0;
     this.HUMID = 0;
-    const device = new TuyAPI({
+    this.device = new TuyAPI({
       id: this.id,
       key: this.key,
       ip: this.ip,
@@ -22,28 +22,25 @@ module.exports = class Sensor {
 
     let stateHasChanged = false;
 
-    device.find().then(() => {
-      device.connect();
+    this.device.find().then(() => {
+      this.device.connect();
     });
 
-    device.on('connected', () => {
+    this.device.on('connected', () => {
       console.log(`Connected to device! ${this.name}`);
     });
 
-    device.on('disconnected', () => {
+    this.device.on('disconnected', () => {
       console.log(`Disconnected from device ${this.name}.`);
-      setTimeout(() => {
-        device.find().then(() => {
-          device.connect();
-        });
-      }, 5000);
+      this._reconnect();
     });
 
-    device.on('error', (error) => {
+    this.device.on('error', (error) => {
       console.log('Error!', error);
+      this._reconnect();
     });
 
-    device.on('dp-refresh', (data) => {
+    this.device.on('dp-refresh', (data) => {
       Object.entries(parseData(data)).forEach(([key, value]) => {
         this[key] = value;
         if (key === 'TEMP') {
@@ -54,16 +51,23 @@ module.exports = class Sensor {
       });
     });
 
-    device.on('data', (data) => {
+    this.device.on('data', (data) => {
       Object.entries(parseData(data)).forEach(([key, value]) => {
         this[key] = value;
       });
 
       if (!stateHasChanged) {
-        device.set({ set: !data.dps['1'] });
+        this.device.set({ set: !data.dps['1'] });
         stateHasChanged = true;
       }
     });
+  }
+  _reconnect() {
+    setTimeout(() => {
+      this.device.find().then(() => {
+        this.device.connect();
+      });
+    }, 5000);
   }
   get pm10() {
     return this.PM10;

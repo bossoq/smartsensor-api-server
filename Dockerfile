@@ -2,7 +2,7 @@ FROM node:16-buster-slim
 
 WORKDIR /app
 
-COPY package.json .
+COPY package.json yarn.lock ./
 
 COPY tsconfig.json .
 
@@ -16,6 +16,10 @@ RUN yarn
 
 COPY /src ./src
 
-COPY config.json ./src/
+# COPY config.json ./src/
+
+EXPOSE 3000
+
+EXPOSE 6668
 
 CMD ["yarn", "dev"]
