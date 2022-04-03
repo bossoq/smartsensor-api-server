@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const password = require('./config.json').password;
 
-const endpoint = 'http://10.0.1.244:8080';
+const endpoint = 'http://10.0.4.3:8080';
 const tempKey = 'CurrentTemperature';
 const humidKey = 'CurrentRelativeHumidity';
 const sensor1TempPath = '/living-room-temperature';
