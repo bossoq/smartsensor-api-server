@@ -12,8 +12,8 @@ const sensor2TempPath = '/bed-room-temperature';
 const sensor1HumidPath = '/living-room-humidity';
 const sensor2HumidPath = '/bed-room-humidity';
 const sensor1AQIPath = '/living-room-aqi';
-const sensor1PM10Path = '/living-room-pm10';
-const sensor1PM25Path = '/living-room-pm25';
+// const sensor1PM10Path = '/living-room-pm10';
+// const sensor1PM25Path = '/living-room-pm25';
 
 module.exports = async (name, type, value) => {
   let url = endpoint;
@@ -37,10 +37,10 @@ module.exports = async (name, type, value) => {
     url += sensor1AQIPath;
   } else if (type === 'PM10') {
     key = pm10Key;
-    url += sensor1PM10Path;
+    url += sensor1AQIPath;
   } else if (type === 'PM25') {
     key = pm25Key;
-    url += sensor1PM25Path;
+    url += sensor1AQIPath;
   }
   const body = JSON.stringify({
     characteristic: key,

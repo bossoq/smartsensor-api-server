@@ -17,7 +17,12 @@ app.get('/api/getHumidity2', (req, res) => {
   res.send(sensor1.humidity.toString())
 })
 app.get('/api/getAQI', (req, res) => {
-  res.send(sensor1.aqi.toString())
+  const data = {
+    pm25: sensor1.pm25,
+    pm10: sensor1.pm10,
+    aqi: sensor1.aqi
+  }
+  res.send(JSON.stringify(data))
 })
 app.get('/api/getPM10', (req, res) => {
   res.send(sensor1.pm10.toString())
