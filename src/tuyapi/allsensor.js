@@ -12,6 +12,7 @@ module.exports = class Sensor {
     this.PM1 = 0;
     this.TEMP = 0;
     this.HUMID = 0;
+    this.AQI = 0;
     this.device = new TuyAPI({
       id: this.id,
       key: this.key,
@@ -19,6 +20,10 @@ module.exports = class Sensor {
       version: '3.3',
       issueRefreshOnConnect: true
     });
+    this.limits = {
+      pm10: [0, 20, 40, 75, 100],
+      pm25: [0, 15, 30, 50, 70]
+    };
 
     let stateHasChanged = false;
 
@@ -47,18 +52,37 @@ module.exports = class Sensor {
           pushUpdate(this.name, 'TEMP', value);
         } else if (key === 'HUMID') {
           pushUpdate(this.name, 'HUMID', value);
+        } else if (key === 'PM10') {
+          pushUpdate(this.name, 'PM10', value);
+        } else if (key === 'PM25') {
+          pushUpdate(this.name, 'PM25', value);
         }
       });
+      this.calcAQI();
+      pushUpdate(this.name, 'AQI', this.AQI);
     });
 
     this.device.on('data', (data) => {
       Object.entries(parseData(data)).forEach(([key, value]) => {
         this[key] = value;
       });
+      this.calcAQI();
 
       if (!stateHasChanged) {
         this.device.set({ set: !data.dps['1'] });
         stateHasChanged = true;
+      }
+    });
+  }
+  calcAQI() {
+    this.limits.pm10.forEach((limit, index) => {
+      if (this.PM10 > limit && this.AQI < index) {
+        this.AQI = index;
+      }
+    });
+    this.limits.pm25.forEach((limit, index) => {
+      if (this.PM25 > limit && this.AQI < index) {
+        this.AQI = index;
       }
     });
   }
@@ -77,6 +101,9 @@ module.exports = class Sensor {
   }
   get pm1() {
     return this.PM1;
+  }
+  get aqi() {
+    return this.AQI;
   }
   get temperature() {
     return this.TEMP;

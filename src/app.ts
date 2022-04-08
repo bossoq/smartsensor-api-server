@@ -16,6 +16,15 @@ app.get('/api/getHumidity1', (req, res) => {
 app.get('/api/getHumidity2', (req, res) => {
   res.send(sensor1.humidity.toString())
 })
+app.get('/api/getAQI', (req, res) => {
+  res.send(sensor1.aqi.toString())
+})
+app.get('/api/getPM10', (req, res) => {
+  res.send(sensor1.pm10.toString())
+})
+app.get('/api/getPM25', (req, res) => {
+  res.send(sensor1.pm25.toString())
+})
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
