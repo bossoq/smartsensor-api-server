@@ -1,0 +1,54 @@
+name: Universal remote control
+products:
+  - id: whs3cty93fzrqkpt
+# Remote device is not supported, as it requires sub devices and a new platform
+# But we can support the sensors on the device.
+primary_entity:
+  entity: sensor
+  name: Temperature
+  class: temperature
+  dps:
+    - id: 104
+      name: sensor
+      type: integer
+      class: measurement
+      unit: C
+      mapping:
+        - scale: 10
+secondary_entities:
+  - entity: sensor
+    name: Humidity
+    class: humidity
+    dps:
+      - id: 105
+        name: sensor
+        type: integer
+        class: measurement
+        unit: '%'
+  - entity: sensor
+    name: PM10
+    class: pm10
+    dps:
+      - id: 101
+        name: sensor
+        type: integer
+        class: measurement
+        unit: 'µg/m³'
+  - entity: sensor
+    name: PM2.5
+    class: pm25
+    dps:
+      - id: 102
+        name: sensor
+        type: integer
+        class: measurement
+        unit: 'µg/m³'
+  - entity: sensor
+    name: PM1.0
+    class: pm1
+    dps:
+      - id: 103
+        name: sensor
+        type: integer
+        class: measurement
+        unit: 'µg/m³'
