@@ -1,62 +1,63 @@
 const fetch = require('node-fetch');
-const password = require('./config.json').password;
+const apiKey = require('./config.json').apiKey;
 
-const endpoint = process.env.ENDPOINT || 'http://10.0.4.3:8080';
-const tempKey = 'CurrentTemperature';
-const humidKey = 'CurrentRelativeHumidity';
-const aqiKey = 'AirQuality';
-const pm10Key = 'PM10Density';
-const pm25Key = 'PM2_5Density';
-const sensor1TempPath = '/living-room-temperature';
-const sensor2TempPath = '/bed-room-temperature';
-const sensor1HumidPath = '/living-room-humidity';
-const sensor2HumidPath = '/bed-room-humidity';
-const sensor1AQIPath = '/living-room-aqi';
-// const sensor1PM10Path = '/living-room-pm10';
-// const sensor1PM25Path = '/living-room-pm25';
+const endpoint =
+  process.env.ENDPOINT || 'http://10.0.6.1:8123/api/states/sensor.';
+const addElecKey = 'Energy';
+const currentKey = 'Current';
+const powerKey = 'Power';
+const voltageKey = 'Voltage';
+const addElecPath = 'ev_energy_meter_addelec';
+const currentPath = 'ev_energy_meter_current';
+const powerPath = 'ev_energy_meter_power';
+const voltagePath = 'ev_energy_meter_voltage';
+const addElecName = 'EV Energy Meter Add Elec';
+const currentName = 'EV Energy Meter Current';
+const powerName = 'EV Energy Meter Power';
+const voltageName = 'EV Energy Meter Voltage';
 
-module.exports = async (name, type, value) => {
+module.exports = async (type, value, unit) => {
   let url = endpoint;
   let key;
-  if (type === 'TEMP') {
-    key = tempKey;
-    if (name === 'sensor1') {
-      url += sensor1TempPath;
-    } else if (name === 'sensor2') {
-      url += sensor2TempPath;
-    }
-  } else if (type === 'HUMID') {
-    key = humidKey;
-    if (name === 'sensor1') {
-      url += sensor1HumidPath;
-    } else if (name === 'sensor2') {
-      url += sensor2HumidPath;
-    }
-  } else if (type === 'AQI') {
-    key = aqiKey;
-    url += sensor1AQIPath;
-  } else if (type === 'PM10') {
-    key = pm10Key;
-    url += sensor1AQIPath;
-  } else if (type === 'PM25') {
-    key = pm25Key;
-    url += sensor1AQIPath;
+  let friendlyName;
+  if (type === 'AddElec') {
+    url += addElecPath;
+    key = addElecKey;
+    friendlyName = addElecName;
+  } else if (type === 'Current') {
+    url += currentPath;
+    key = currentKey;
+    friendlyName = currentName;
+  } else if (type === 'Power') {
+    url += powerPath;
+    key = powerKey;
+    friendlyName = powerName;
+  } else if (type === 'Voltage') {
+    url += voltagePath;
+    key = voltageKey;
+    friendlyName = voltageName;
   }
   const body = JSON.stringify({
-    characteristic: key,
-    value: value,
-    password
+    state: value,
+    attributes: {
+      unit_of_measurement: unit,
+      friendly_name: friendlyName,
+      device_class: key
+    }
   });
   const options = {
     method: 'POST',
     body,
     headers: {
+      Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json'
     }
   };
   try {
     await fetch(url, options);
   } catch (err) {
-    console.error(`Could not update ${name} ${type} to ${value} with ${err}`);
+    console.error(
+      `Could not update ${friendlyName} ${type} to ${value} with ${err}`
+    );
   }
 };

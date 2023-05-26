@@ -7,8 +7,10 @@ module.exports = class Sensor {
     this.id = sensor.id;
     this.key = sensor.key;
     this.ip = sensor.ip;
-    this.TEMP = 0;
-    this.HUMID = 0;
+    this.AddElec = 0;
+    this.Current = 0;
+    this.Power = 0;
+    this.Voltage = 0;
     this.device = new TuyAPI({
       id: this.id,
       key: this.key,
@@ -40,10 +42,14 @@ module.exports = class Sensor {
     this.device.on('dp-refresh', (data) => {
       Object.entries(parseData(data)).forEach(([key, value]) => {
         this[key] = value;
-        if (key === 'TEMP') {
-          pushUpdate(this.name, 'TEMP', value);
-        } else if (key === 'HUMID') {
-          pushUpdate(this.name, 'HUMID', value);
+        if (key === 'AddElec') {
+          pushUpdate('AddElec', value, 'kWh');
+        } else if (key === 'Current') {
+          pushUpdate('Current', value, 'A');
+        } else if (key === 'Power') {
+          pushUpdate('Power', value, 'W');
+        } else if (key === 'Voltage') {
+          pushUpdate('Voltage', value, 'V');
         }
       });
     });
@@ -51,6 +57,15 @@ module.exports = class Sensor {
     this.device.on('data', (data) => {
       Object.entries(parseData(data)).forEach(([key, value]) => {
         this[key] = value;
+        if (key === 'AddElec') {
+          pushUpdate('AddElec', value, 'kWh');
+        } else if (key === 'Current') {
+          pushUpdate('Current', value, 'A');
+        } else if (key === 'Power') {
+          pushUpdate('Power', value, 'W');
+        } else if (key === 'Voltage') {
+          pushUpdate('Voltage', value, 'V');
+        }
       });
 
       if (!stateHasChanged) {
@@ -66,11 +81,17 @@ module.exports = class Sensor {
       });
     }, 5000);
   }
-  get temperature() {
-    return this.TEMP;
+  get addElec() {
+    return this.AddElec;
   }
-  get humidity() {
-    return this.HUMID;
+  get current() {
+    return this.Current;
+  }
+  get power() {
+    return this.Power;
+  }
+  get voltage() {
+    return this.Voltage;
   }
 };
 
@@ -79,11 +100,17 @@ const parseData = (data) => {
 
   Object.entries(data.dps).forEach(([key, value]) => {
     switch (key) {
-      case '101':
-        parsedData.TEMP = value * 0.1;
+      case '17':
+        parsedData.AddElec = value / 1000;
         break;
-      case '102':
-        parsedData.HUMID = value;
+      case '18':
+        parsedData.Current = value / 1000;
+        break;
+      case '19':
+        parsedData.Power = value / 10;
+        break;
+      case '20':
+        parsedData.Voltage = value / 10;
         break;
       default:
         break;
