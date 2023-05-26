@@ -16,7 +16,7 @@ RUN yarn
 
 COPY /src ./src
 
-# COPY config.json ./src/
+COPY config.json ./src/
 
 EXPOSE 3000
 
